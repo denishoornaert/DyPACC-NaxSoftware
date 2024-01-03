@@ -22,7 +22,12 @@ _start:
 
 
 init:
+	/* Calculate Stackpointer per hart 
+	   Each Hart has a 4K stack (max 8 harts) */
 	la sp, _sp
+	csrr t0, mhartid
+	slli t0, t0, 12
+	add sp, sp, t0
 
 	/* Load data section */
 	la a0, _data_lma
