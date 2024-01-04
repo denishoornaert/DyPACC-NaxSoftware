@@ -9,7 +9,9 @@
 #define CACHE_LINE_SIZE 64
 
 // Defines the number of harts that will attempt to cause cache misses
-#define WORKER_NUM 7
+#ifndef WORKER_NUM
+#define WORKER_NUM 0
+#endif
 
 /* Inefficient function to print a number in base 10 */
 void sim_put_num(u32 value)
@@ -65,6 +67,11 @@ void main()
     u32 end_c = csr_read(mcycle);
     u32 end_t = sim_time();
 
+    sim_puts("BufferSize: 0x");
+    sim_puthex(BUFFER_SIZE);
+    sim_puts(" = ");
+    sim_put_num(BUFFER_SIZE);
+    sim_puts("\n");
     sim_puts("Cycles: 0x");
     sim_puthex(end_c - start_c);
     sim_puts(" = ");
@@ -75,4 +82,8 @@ void main()
     sim_puts(" = ");
     sim_put_num(end_t - start_t);
     sim_puts("\n");
+
+    // Wait for output to stabalize before finishing
+    while (csr_read(mcycle) - end_c < 1000)
+        ;
 }

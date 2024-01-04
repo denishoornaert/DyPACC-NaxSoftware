@@ -1,5 +1,8 @@
 PROJ_NAME=benchmarker
 
+WORKER_NUM?=0
+CFLAGS += -DWORKER_NUM=$(WORKER_NUM)
+
 DEBUG=yes
 BENCH=no
 STANDALONE = ..
