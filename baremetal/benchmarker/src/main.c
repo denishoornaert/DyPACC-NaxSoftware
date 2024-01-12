@@ -10,7 +10,7 @@
 
 // Defines the number of harts that will attempt to cause cache misses
 #ifndef WORKER_NUM
-#define WORKER_NUM 0
+#define WORKER_NUM 7
 #endif
 
 /* Inefficient function to print a number in base 10 */
@@ -28,18 +28,19 @@ void sim_put_num(u32 value)
 }
 
 /* Access data between start and end, (hopefully) causing cache misses */
-void dummy_work(u32 start, u32 end)
+void dummy_work(const u32 start, const u32 end, u32* sum)
 {
-    for (volatile u8 *p = (u8 *)start; p < (u8 *)end; p += CACHE_LINE_SIZE)
-        (*p); // should perform memory access
+    for (u8 *p = (u8 *)start; p < (u8 *)end; p += CACHE_LINE_SIZE)
+        (*sum) += (*p); // should perform memory access 
 }
 
 /* Cause cache misses forever */
 __attribute__((noreturn)) void endless_work(u32 hart_id)
 {
+    u32 sum = 0;
     while (1)
     {
-        dummy_work(BUFFER_START + hart_id * BUFFER_SIZE, BUFFER_START + (hart_id + 1) * BUFFER_SIZE);
+        dummy_work(BUFFER_START + hart_id * BUFFER_SIZE, BUFFER_START + (hart_id + 1) * BUFFER_SIZE, &sum);
     }
 }
 
@@ -60,10 +61,12 @@ void main()
     else if (hart_id > 0)
         endless_wait();
 
+    // Declare a checksum variable to enforce dummy work to be kept by the compiler
+    u32 sum = 0;
     /* Hart 0 is being benchmarked */
     u32 start_t = sim_time();
     u32 start_c = csr_read(mcycle);
-    dummy_work(BUFFER_START, BUFFER_START + BUFFER_SIZE); // because hart_id is 0
+    dummy_work(BUFFER_START, BUFFER_START + BUFFER_SIZE, &sum); // because hart_id is 0
     u32 end_c = csr_read(mcycle);
     u32 end_t = sim_time();
 
@@ -81,6 +84,10 @@ void main()
     sim_puthex(end_t - start_t);
     sim_puts(" = ");
     sim_put_num(end_t - start_t);
+    sim_puts("\n");
+    // The printing here is necessary to ensure that the 'sum' variable is not optimized away!
+    sim_puts("Checksum: 0x");
+    sim_puthex(sum);
     sim_puts("\n");
 
     // Wait for output to stabalize before finishing
