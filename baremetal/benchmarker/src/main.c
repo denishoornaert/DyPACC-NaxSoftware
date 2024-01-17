@@ -28,10 +28,10 @@ void sim_put_num(u32 value)
 }
 
 /* Access data between start and end, (hopefully) causing cache misses */
-void dummy_work(const u32 start, const u32 end, u32* sum)
+void dummy_work(const u32 start, const u32 end, u32 *sum)
 {
     for (u8 *p = (u8 *)start; p < (u8 *)end; p += CACHE_LINE_SIZE)
-        (*sum) += (*p); // should perform memory access 
+        (*sum) += (*p); // should perform memory access
 }
 
 /* Cause cache misses forever */
@@ -60,6 +60,28 @@ void main()
         endless_work(hart_id);
     else if (hart_id > 0)
         endless_wait();
+
+    u32 new_fetch_prio = 0;
+    u32 new_data_prio = 1;
+    u32 new_peri_prio = 2;
+    u32 old_data_prio = csr_swap(0xBC0, new_data_prio);
+    u32 old_fetch_prio = csr_swap(0xBC4, new_fetch_prio);
+    u32 old_peri_prio = csr_swap(0xBC8, new_peri_prio);
+    sim_puts("DataBus prio changed from ");
+    sim_puthex(old_data_prio);
+    sim_puts(" to ");
+    sim_put_num(new_data_prio);
+    sim_puts("\n");
+    sim_puts("InstructionBus prio changed from ");
+    sim_puthex(old_fetch_prio);
+    sim_puts(" to ");
+    sim_put_num(new_fetch_prio);
+    sim_puts("\n");
+    sim_puts("PeripheralBus prio changed from ");
+    sim_puthex(old_peri_prio);
+    sim_puts(" to ");
+    sim_put_num(new_peri_prio);
+    sim_puts("\n");
 
     // Declare a checksum variable to enforce dummy work to be kept by the compiler
     u32 sum = 0;
