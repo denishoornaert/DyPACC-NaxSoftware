@@ -17,11 +17,12 @@
 // #include <stdint.h>
 #include <math.h>
 
-#include "../include/filters.h"
+#include "../include/common_filters.h"
 
 int fpmax(float a, float b) { return (a > b) ? a : b; }
 int fpmin(float a, float b) { return (a < b) ? a : b; }
 
+// prio
 void threshold(struct bmp_t *img)
 {
     for (u32 h = 0; h < img->height; h++)
@@ -29,6 +30,7 @@ void threshold(struct bmp_t *img)
             img->data[h][r] = (img->data[h][r] >= 128) ? 255 : 0;
 }
 
+// prio
 void grayscale(struct bmp_t *img, struct bmp_t *out)
 {
     for (u32 h = 0; h < img->height; h++)
@@ -44,6 +46,7 @@ void grayscale(struct bmp_t *img, struct bmp_t *out)
     }
 }
 
+// prio
 void sepia(struct bmp_t *img, struct bmp_t *out)
 {
     for (u32 h = 0; h < img->height; h++)
@@ -63,60 +66,58 @@ void sepia(struct bmp_t *img, struct bmp_t *out)
     }
 }
 
-// ToDo: Fix Math import
-// void sobel(struct bmp_t *img, struct bmp_t *out, unsigned size, int kh[size][size], int kv[size][size])
-// {
-//     unsigned half_size = size / 2;
-//     for (u32 h = half_size; h < img->height - half_size; h++)
-//     {
-//         for (u32 p = img->depth * half_size; p < (img->width - half_size) * img->depth; p += img->depth)
-//         {
-//             int gx = 0;
-//             int gy = 0;
-//             for (u32 i = 0; i < size; i++)
-//             {
-//                 for (u32 j = 0; j < size; j++)
-//                 {
-//                     gx += img->data[h + (i - half_size)][p + ((j - half_size) * img->depth)] * kh[i][j];
-//                     gy += img->data[h + (i - half_size)][p + ((j - half_size) * img->depth)] * kv[i][j];
-//                 }
-//             }
-//             char color = fpmin(fpmax(sqrt(pow(gx, 2) + pow(gy, 2)), 0), 255);
-//             out->data[h][p + 2] = color;
-//             out->data[h][p + 1] = color;
-//             out->data[h][p + 0] = color;
-//         }
-//     }
-// }
+void sobel(struct bmp_t *img, struct bmp_t *out, unsigned size, int kh[size][size], int kv[size][size])
+{
+    unsigned half_size = size / 2;
+    for (u32 h = half_size; h < img->height - half_size; h++)
+    {
+        for (u32 p = img->depth * half_size; p < (img->width - half_size) * img->depth; p += img->depth)
+        {
+            int gx = 0;
+            int gy = 0;
+            for (u32 i = 0; i < size; i++)
+            {
+                for (u32 j = 0; j < size; j++)
+                {
+                    gx += img->data[h + (i - half_size)][p + ((j - half_size) * img->depth)] * kh[i][j];
+                    gy += img->data[h + (i - half_size)][p + ((j - half_size) * img->depth)] * kv[i][j];
+                }
+            }
+            char color = fpmin(fpmax(sqrt(pow(gx, 2) + pow(gy, 2)), 0), 255);
+            out->data[h][p + 2] = color;
+            out->data[h][p + 1] = color;
+            out->data[h][p + 0] = color;
+        }
+    }
+}
 
-// ToDo: Fix Math import
-// void sobel_gradient(struct bmp_t *img, struct bmp_t *out, unsigned size, int kh[size][size], int kv[size][size], float **theta)
-// {
-//     unsigned half_size = size / 2;
-//     for (u32 h = half_size; h < img->height - half_size; h++)
-//     {
-//         u32 r = half_size;
-//         for (u32 p = img->depth * half_size; p < (img->width - half_size) * img->depth; p += img->depth)
-//         {
-//             int gx = 0;
-//             int gy = 0;
-//             for (u32 i = 0; i < size; i++)
-//             {
-//                 for (u32 j = 0; j < size; j++)
-//                 {
-//                     gx += img->data[h + (i - half_size)][p + ((j - half_size) * img->depth)] * kh[i][j];
-//                     gy += img->data[h + (i - half_size)][p + ((j - half_size) * img->depth)] * kv[i][j];
-//                 }
-//             }
-//             char color = fpmin(fpmax(sqrt(pow(gx, 2) + pow(gy, 2)), 0), 255);
-//             out->data[h][p + 2] = color;
-//             out->data[h][p + 1] = color;
-//             out->data[h][p + 0] = color;
-//             theta[h][r] = atan((double)gx / (double)gy);
-//             r++;
-//         }
-//     }
-// }
+void sobel_gradient(struct bmp_t *img, struct bmp_t *out, unsigned size, int kh[size][size], int kv[size][size], float **theta)
+{
+    unsigned half_size = size / 2;
+    for (u32 h = half_size; h < img->height - half_size; h++)
+    {
+        u32 r = half_size;
+        for (u32 p = img->depth * half_size; p < (img->width - half_size) * img->depth; p += img->depth)
+        {
+            int gx = 0;
+            int gy = 0;
+            for (u32 i = 0; i < size; i++)
+            {
+                for (u32 j = 0; j < size; j++)
+                {
+                    gx += img->data[h + (i - half_size)][p + ((j - half_size) * img->depth)] * kh[i][j];
+                    gy += img->data[h + (i - half_size)][p + ((j - half_size) * img->depth)] * kv[i][j];
+                }
+            }
+            char color = fpmin(fpmax(sqrt(pow(gx, 2) + pow(gy, 2)), 0), 255);
+            out->data[h][p + 2] = color;
+            out->data[h][p + 1] = color;
+            out->data[h][p + 0] = color;
+            theta[h][r] = atan((double)gx / (double)gy);
+            r++;
+        }
+    }
+}
 
 void gaussian_noise(struct bmp_t *img, struct bmp_t *out, unsigned size, float conv[size][size])
 {

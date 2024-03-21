@@ -6,12 +6,12 @@
  *
  * @copyright (C) 2022 Denis Hoornaert <denis.hoornaert@tum.de>
  * SPDX-License-Identifier: MIT
-*/
+ */
 
 #ifndef FILTERS_H
 #define FILTERS_H
 
-#include "../include/common.h"
+#include "../include/common_filters.h"
 
 /** @brief Function returning as int the maximal value between two floats.
  * @param[in] a First float to compare.
@@ -53,7 +53,7 @@ void sepia(struct bmp_t *img, struct bmp_t *out);
  * @param[in] kv Vertical kernel of size `size` by `size`.
  */
 void sobel(struct bmp_t *img, struct bmp_t *out, unsigned size,
-	   int kh[size][size], int kv[size][size]);
+		   int kh[size][size], int kv[size][size]);
 
 /** @brief Function applying a sobel filter on the image given in paramter.
  * @param[in] img Input image from which the data is read.
@@ -64,9 +64,9 @@ void sobel(struct bmp_t *img, struct bmp_t *out, unsigned size,
  * @param[in] kv Vertical kernel of size `size` by `size`.
  */
 void sobel_gradient(struct bmp_t *img, struct bmp_t *out, unsigned size,
-		    int kh[size][size], int kv[size][size], float **theta);
+					int kh[size][size], int kv[size][size], float **theta);
 
-/** @brief Function applying a gaussian noise filter with kernel size of 3x3 on 
+/** @brief Function applying a gaussian noise filter with kernel size of 3x3 on
  * the image given in paramter.
  * @param[in] img Input image from which the data is read.
  * @param[out] out Output image in which the filtered image is stored.
@@ -74,7 +74,7 @@ void sobel_gradient(struct bmp_t *img, struct bmp_t *out, unsigned size,
  * @param[in] conv Convolution kernel of size `size` by `size`.
  */
 void gaussian_noise(struct bmp_t *img, struct bmp_t *out, unsigned size,
-		    float conv[size][size]);
+					float conv[size][size]);
 
 /** @brief Perform max suppression on sobel image with its accompanying gradient.
  * @param[in] img Image input from which the data is read.
@@ -83,7 +83,7 @@ void gaussian_noise(struct bmp_t *img, struct bmp_t *out, unsigned size,
  * @param[out] max Maximal value in `out`.
  */
 void non_max_suppression(struct bmp_t *img, struct bmp_t *out, float **theta,
-			 uint8_t *max);
+						 uint8_t *max);
 
 /** @brief Apply double threshold filtering on input image
  * @param[inout] img Image input from which the data is read.

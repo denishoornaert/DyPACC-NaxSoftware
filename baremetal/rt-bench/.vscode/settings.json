@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "math.h": "c"
+        "*.x": "linkerscript",
+        "math.h": "c",
+        "filters.h": "c",
+        "functional": "c"
     }
 }
