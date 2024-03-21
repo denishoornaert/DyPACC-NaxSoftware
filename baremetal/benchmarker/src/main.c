@@ -70,7 +70,8 @@ void latency_bench(const u32 start, const u32 end, u32 *sum)
 /* Cause cache misses forever */
 __attribute__((noreturn)) void endless_work(u32 hart_id)
 {
-    u32 new_prio = hart_id == MAIN_PRIO ? MAIN_CORE : hart_id;
+    u32 target_prio = 7 - hart_id;
+    u32 new_prio = target_prio == MAIN_PRIO ? (7 - MAIN_CORE) : target_prio;
     u32 old_data_prio = csr_swap(0xBC0, new_prio);
     u32 old_fetch_prio = csr_swap(0xBC4, new_prio);
     u32 old_peri_prio = csr_swap(0xBC8, new_prio);
