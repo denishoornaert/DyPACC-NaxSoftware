@@ -3,6 +3,9 @@
 #include <riscv.h>
 #include "putnum.h"
 
+#if defined(BENCH_THRESHOLD) || defined(BENCH_GRAYSCALE) || defined(BENCH_SEPIA) || defined(BENCH_SOBEL) || defined(BENCH_GAUSSIAN_NOISE)
+// ignore
+#else
 extern int benchmark_init(int parameters_num, void **parameters);
 extern void benchmark_execution(int parameters_num, void **parameters);
 
@@ -40,3 +43,4 @@ void tacl_main()
     while (csr_read(mcycle) - end_c < 1000)
         ;
 }
+#endif
