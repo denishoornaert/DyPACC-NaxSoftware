@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.x": "linkerscript",
+        "math.h": "c",
+        "filters.h": "c",
+        "functional": "c",
+        "atomic": "c",
+        "typeinfo": "c"
+    }
+}
